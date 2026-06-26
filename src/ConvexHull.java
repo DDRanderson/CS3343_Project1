@@ -233,13 +233,13 @@ public class ConvexHull {
                 changed = false;
 
                 // Advance l CCW (decreasing index) on left hull while improving
-                while (cross(right.get(r), left.get(l), left.get(l - 1)) < 0) {
+                while (cross(right.get(r), left.get(l), left.get(l - 1)) > 0) {
                     l--;
                     changed = true;
                 }
 
                 // Advance r CW (increasing index) on right hull while improving
-                while (cross(left.get(l), right.get(r), right.get(r + 1)) > 0) {
+                while (cross(left.get(l), right.get(r), right.get(r + 1)) < 0) {
                     r++;
                     changed = true;
                 }
@@ -276,13 +276,13 @@ public class ConvexHull {
                 changed = false;
 
                 // Advance l CW (increasing index) on left hull while improving
-                while (cross(right.get(r), left.get(l), left.get(l + 1)) > 0) {
+                while (cross(right.get(r), left.get(l), left.get(l + 1)) < 0) {
                     l++;
                     changed = true;
                 }
 
                 // Advance r CCW (decreasing index) on right hull while improving
-                while (cross(left.get(l), right.get(r), right.get(r - 1)) < 0) {
+                while (cross(left.get(l), right.get(r), right.get(r - 1)) > 0) {
                     r--;
                     changed = true;
                 }
@@ -339,6 +339,10 @@ public class ConvexHull {
                 merged.add(left.get(i));
                 if (i == lU) break;
                 i++;
+              //sanitize the data to fix OB indexing
+                int n = left.size();
+                i = (((i % n) + n) % n);
+
             }
 
             // Walk CCW along right hull from rU down to and including rL.
@@ -348,6 +352,9 @@ public class ConvexHull {
                 merged.add(right.get(j));
                 if (j == rL) break;
                 j++;
+              //sanitize the data to fix OB indexing
+                int m = right.size();
+                j = (((j % m) + m) % m);
             }
 
             return new Hull(merged);
