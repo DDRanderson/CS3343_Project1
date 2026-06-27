@@ -244,11 +244,6 @@ public class ConvexHull {
                     changed = true;
                 }
             }
-            //sanitize the data to fix OB indexing
-            int n = left.size();
-            l = (((l % n) + n) % n);
-            int m = right.size();
-            r = (((r % m) + m) % m);
 
             return new int[]{l, r};
         }
@@ -287,11 +282,6 @@ public class ConvexHull {
                     changed = true;
                 }
             }
-            //sanitize the data to fix OB indexing
-            int n = left.size();
-            l = (((l % n) + n) % n);
-            int m = right.size();
-            r = (((r % m) + m) % m);
             
             return new int[]{l, r};
         }
@@ -323,42 +313,38 @@ public class ConvexHull {
          * @param lowerTangent  int[]{lL, rL} from TangentFinder.findLowerTangent
          * @return a new Hull in CCW order representing the merged convex hull
          */
-        static Hull merge(Hull left, Hull right,
-                          int[] upperTangent, int[] lowerTangent) {
-            int lU = upperTangent[0];
-            int rU = upperTangent[1];
-            int lL = lowerTangent[0];
-            int rL = lowerTangent[1];
+    	static Hull merge(Hull left, Hull right,
+            int[] upperTangent, int[] lowerTangent) {
+			  int lU = upperTangent[0];
+			  int rU = upperTangent[1];
+			  int lL = lowerTangent[0];
+			  int rL = lowerTangent[1];
+			
+			  // Grab the actual Point objects at the tangent positions.
+			  // We use reference equality below so normalization doesn't matter.
+			  Point pLU = left.get(lU);
+			  Point pRL = right.get(rL);
+			
+			  List<Point> merged = new ArrayList<>();
+			
+			  // Walk CCW along left hull from lL up to and including lU.
+			  int i = lL;
+			  while (true) {
+			      merged.add(left.get(i));
+			      if (left.get(i) == pLU) break;
+			      i++;
+			  }
+			
+			  // Walk CCW along right hull from rU up to and including rL.
+			  int j = rU;
+			  while (true) {
+			      merged.add(right.get(j));
+			      if (right.get(j) == pRL) break;
+			      j++;
+			  }
 
-            List<Point> merged = new ArrayList<>();
-
-            // Walk CCW along left hull from lL up to and including lU.
-            // CCW on the left hull means increasing index (with wrap-around).
-            int i = lL;
-            while (true) {
-                merged.add(left.get(i));
-                if (i == lU) break;
-                i++;
-              //sanitize the data to fix OB indexing
-                int n = left.size();
-                i = (((i % n) + n) % n);
-
-            }
-
-            // Walk CCW along right hull from rU down to and including rL.
-            // CCW on the right hull means increasing index (with wrap-around).
-            int j = rU;
-            while (true) {
-                merged.add(right.get(j));
-                if (j == rL) break;
-                j++;
-              //sanitize the data to fix OB indexing
-                int m = right.size();
-                j = (((j % m) + m) % m);
-            }
-
-            return new Hull(merged);
-        }
+			  	return new Hull(merged);
+    	}
     }
 
     // -------------------------------------------------------------------------
